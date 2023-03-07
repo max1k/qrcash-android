@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">QR Cash</string>
+    <string name="deposit_withdraw">Снятие и внесение наличных</string>
+    <string name="withdraw_cash">Снять наличные</string>
+    <string name="deposit_cash">Внести наличные</string>
+    <string name="operation_troubleshooting">Если возникли проблемы со снятием или внесением наличных, позвоните по бесплатному номеру 8 800 123–45–67</string>
 </resources>
