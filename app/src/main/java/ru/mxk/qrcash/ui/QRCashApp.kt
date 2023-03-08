@@ -22,9 +22,13 @@ fun QRCashApp(
     ) {
         composable(route = QRCashScreen.OPERATION_CHOOSE.url) {
             OperationChooseScreen(
-                onWithdrawClick = {},
-                onDepositClick = {}
+                onWithdrawClick = { navController.navigate(QRCashScreen.WITHDRAWAL.url) },
+                onDepositClick = { navController.navigate(QRCashScreen.DEPOSIT.url) }
             )
+        }
+
+        composable(route = QRCashScreen.WITHDRAWAL.url) {
+
         }
     }
 }
