@@ -25,6 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,7 +75,15 @@ fun OperationChooseScreen(
 
         val context = LocalContext.current
         Text(
-            text = stringResource(id = R.string.operation_troubleshooting),
+            text = buildAnnotatedString {
+                append(stringResource(id = R.string.operation_troubleshooting))
+                addStyle(
+                    style = SpanStyle(
+                        color = Color(0xff64B5F6),
+                        textDecoration = TextDecoration.Underline
+                    ), start = 90, end = 105
+                )
+            },
             fontSize = 16.sp,
             modifier = Modifier
                 .clickable {

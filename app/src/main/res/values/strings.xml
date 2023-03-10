@@ -4,4 +4,6 @@
     <string name="withdraw_cash">Снять наличные</string>
     <string name="deposit_cash">Внести наличные</string>
     <string name="operation_troubleshooting">Если возникли проблемы со снятием или внесением наличных, позвоните по бесплатному номеру 8 800 123–45–67</string>
+    <string name="cash_withdrawal">Снятие наличных</string>
+    <string name="withdrawal_card">Карта списания</string>
 </resources>
