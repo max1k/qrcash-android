@@ -22,7 +22,7 @@ class App : Application() {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.224.9.136:8099/qrcash")
+            .baseUrl("http://10.224.9.136:8099/qrcash/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(httpClient)
             .build()

@@ -9,7 +9,7 @@ import ru.mxk.qrcash.viewmodel.OperationViewModel
 class ViewModelFactory(private val app: App) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    override fun <T: ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
             OperationViewModel::class.java -> OperationViewModel(app.qrCashService) as T
             else -> throw IllegalArgumentException("Unexpected class ${modelClass.simpleName}")
