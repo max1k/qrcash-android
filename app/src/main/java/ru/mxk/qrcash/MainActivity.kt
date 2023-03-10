@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import ru.mxk.qrcash.ui.QRCashApp
 import ru.mxk.qrcash.ui.theme.QRCashTheme
 import ru.mxk.qrcash.viewmodel.OperationViewModel
-import ru.mxk.qrcash.viewmodel.ViewModelFactory
+import ru.mxk.qrcash.viewmodel.factory.ViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private val viewModel: OperationViewModel by viewModels { ViewModelFactory(applicationContext as App) }

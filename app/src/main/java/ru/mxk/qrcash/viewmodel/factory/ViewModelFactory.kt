@@ -1,8 +1,9 @@
-package ru.mxk.qrcash.viewmodel
+package ru.mxk.qrcash.viewmodel.factory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import ru.mxk.qrcash.App
+import ru.mxk.qrcash.viewmodel.OperationViewModel
 
 
 class ViewModelFactory(private val app: App) : ViewModelProvider.Factory {
