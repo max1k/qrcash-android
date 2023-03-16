@@ -10,10 +10,10 @@ import ru.mxk.qrcash.service.QRCashService
 
 
 class App : Application() {
-    private val qrCashRepository: QRCashRepository = createPersonRepository()
+    private val qrCashRepository: QRCashRepository = createQrCashRepository()
     val qrCashService = QRCashService(qrCashRepository)
 
-    private fun createPersonRepository(): QRCashRepository {
+    private fun createQrCashRepository(): QRCashRepository {
         val interceptor = HttpLoggingInterceptor()
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 

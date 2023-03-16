@@ -4,27 +4,33 @@ import com.google.gson.annotations.SerializedName
 import ru.mxk.qrcash.model.OperationType
 import java.math.BigDecimal
 
-interface OperationRequest {
-    val atmId: String
-    val operationType: OperationType
-    val publicId: String
-}
-
-data class WithdrawalOperationRequest(
+data class OperationRequest(
     @SerializedName("ATMNUM")
-    override val atmId: String,
-    val amount: BigDecimal,
-    override val publicId: String,
-    val commission: BigDecimal
-): OperationRequest {
-    override val operationType: OperationType = OperationType.WITHDRAW
-}
+    val atmId: String,
+    val operationType: OperationType,
+    val publicId: String,
+    val amount: BigDecimal?,
+    val commission: BigDecimal?
+) {
+    companion object {
+        fun ofWithdraw(
+            atmId: String,
+            amount: BigDecimal,
+            publicId: String,
+            commission: BigDecimal
+        ): OperationRequest
+        {
+            return OperationRequest(atmId, OperationType.WITHDRAW, publicId, amount, commission)
+        }
 
-data class DepositOperationRequest(
-    override val atmId: String,
-    override val publicId: String
-): OperationRequest {
-    override val operationType: OperationType = OperationType.DEPOSIT
+        fun ofDeposit(
+            atmId: String,
+            publicId: String
+        ): OperationRequest
+        {
+            return OperationRequest(atmId, OperationType.WITHDRAW, publicId, null, null)
+        }
+    }
 }
 
 data class OperationResponse(

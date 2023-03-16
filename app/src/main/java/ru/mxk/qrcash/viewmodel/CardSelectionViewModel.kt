@@ -9,12 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.ViewModelStatus
 import ru.mxk.qrcash.model.ui.CardListUiState
 import ru.mxk.qrcash.service.QRCashService
-import ru.mxk.qrcash.service.converter.FailedResponseException
-import ru.mxk.qrcash.service.converter.getData
 import kotlin.coroutines.CoroutineContext
 
 class CardSelectionViewModel(private val qrCashService: QRCashService): ViewModel(), CoroutineScope {
@@ -24,7 +23,17 @@ class CardSelectionViewModel(private val qrCashService: QRCashService): ViewMode
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
-    fun requestCardList(sessionData: SessionData) {
+    fun reset() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                cardList = null,
+                selectedCard = null,
+                status = ViewModelStatus.INITIALIZING
+            )
+        }
+    }
+
+    fun requestCardList(sessionData: SessionData, onError: () -> Unit) {
         if (!uiState.value.status.canBeReprocessed) {
             return
         }
@@ -32,9 +41,11 @@ class CardSelectionViewModel(private val qrCashService: QRCashService): ViewMode
         updateStatus(ViewModelStatus.LOADING)
 
         launch {
-            val response = qrCashService.start(sessionData)
-            try {
-                val cards = response.getData().accounts.flatMap { it.cards }
+            val result = qrCashService.start(sessionData)
+                .map { it.accounts.flatMap { account -> account.cards } }
+
+            if (result.isPresent()) {
+                val cards = result.data
                 _uiState.update { currentState ->
                     currentState.copy(
                         cardList = cards,
@@ -42,8 +53,11 @@ class CardSelectionViewModel(private val qrCashService: QRCashService): ViewMode
                         status = ViewModelStatus.DONE
                     )
                 }
-            } catch (exception: FailedResponseException) {
+            } else {
                 updateStatus(ViewModelStatus.ERROR)
+                withContext(Dispatchers.Main) {
+                    onError()
+                }
             }
         }
     }

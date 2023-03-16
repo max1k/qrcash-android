@@ -1,6 +1,6 @@
 package ru.mxk.qrcash.service
 
-import retrofit2.Response
+import android.util.Log
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.dto.AccountSummary
 import ru.mxk.qrcash.model.dto.AtmCodeRequest
@@ -11,40 +11,87 @@ import ru.mxk.qrcash.model.dto.OtpCodeRequest
 import ru.mxk.qrcash.model.dto.OtpCodeResponse
 import ru.mxk.qrcash.model.dto.WithdrawalConfirmationRequest
 import ru.mxk.qrcash.model.dto.WithdrawalConfirmationResponse
+import ru.mxk.qrcash.model.dto.request.RequestResult
 import ru.mxk.qrcash.repository.QRCashRepository
 import ru.mxk.qrcash.service.converter.convertToHeadersMap
+import ru.mxk.qrcash.service.converter.getData
 
 class QRCashService(private val qrCashRepository: QRCashRepository) {
 
-    suspend fun start(sessionData: SessionData): Response<AccountSummary> {
-        return qrCashRepository.start(sessionData.convertToHeadersMap())
+    suspend fun start(sessionData: SessionData): RequestResult<AccountSummary> {
+        return try {
+            RequestResult.ofSuccess(
+                qrCashRepository
+                    .start(sessionData.convertToHeadersMap())
+                    .getData()
+            )
+        } catch (exception: Exception) {
+            Log.e("create", exception.message, exception)
+            RequestResult.ofFail()
+        }
     }
 
     suspend fun createOperation(
         operationRequest: OperationRequest,
         sessionData: SessionData
-    ): Response<OperationResponse> {
-        return qrCashRepository.createOperation(operationRequest, sessionData.convertToHeadersMap())
+    ): RequestResult<OperationResponse> {
+        return try {
+            RequestResult.ofSuccess(
+                qrCashRepository
+                    .createOperation(operationRequest, sessionData.convertToHeadersMap())
+                    .getData()
+            )
+        } catch (exception: Exception) {
+            Log.e("create", exception.message, exception)
+            RequestResult.ofFail()
+        }
     }
 
     suspend fun atmCodeCheck(
         atmCodeRequest: AtmCodeRequest,
         sessionData: SessionData
-    ): Response<AtmCodeResponse> {
-        return qrCashRepository.atmCodeCheck(atmCodeRequest, sessionData.convertToHeadersMap())
+    ): RequestResult<AtmCodeResponse> {
+        return try {
+            RequestResult.ofSuccess(
+                qrCashRepository
+                    .atmCodeCheck(atmCodeRequest, sessionData.convertToHeadersMap())
+                    .getData()
+            )
+        } catch (exception: Exception) {
+            Log.e("atm-check", exception.message, exception)
+            RequestResult.ofFail()
+        }
     }
 
     suspend fun withdrawalConfirm(
         request: WithdrawalConfirmationRequest,
         sessionData: SessionData
-    ): Response<WithdrawalConfirmationResponse> {
-        return qrCashRepository.withdrawalConfirm(request, sessionData.convertToHeadersMap())
+    ): RequestResult<WithdrawalConfirmationResponse> {
+        return try {
+            RequestResult.ofSuccess(
+                qrCashRepository
+                    .withdrawalConfirm(request, sessionData.convertToHeadersMap())
+                    .getData()
+            )
+        } catch (exception: Exception) {
+            Log.e("withdrawal-confirm", exception.message, exception)
+            RequestResult.ofFail()
+        }
     }
 
     suspend fun otpCodeCheck(
         otpCodeRequest: OtpCodeRequest,
         sessionData: SessionData
-    ): Response<OtpCodeResponse> {
-        return qrCashRepository.otpCodeCheck(otpCodeRequest, sessionData.convertToHeadersMap())
+    ): RequestResult<OtpCodeResponse> {
+        return try {
+            RequestResult.ofSuccess(
+                qrCashRepository
+                    .otpCodeCheck(otpCodeRequest, sessionData.convertToHeadersMap())
+                    .getData()
+            )
+        } catch (exception: Exception) {
+            Log.e("withdrawal-confirm", exception.message, exception)
+            RequestResult.ofFail()
+        }
     }
 }
