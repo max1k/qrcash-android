@@ -11,20 +11,26 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.mxk.qrcash.model.Card
+import ru.mxk.qrcash.model.CreateScreenStatus
 import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.SessionData
-import ru.mxk.qrcash.model.ViewModelStatus
 import ru.mxk.qrcash.model.dto.OperationRequest
 import ru.mxk.qrcash.model.dto.OperationResponse
-import ru.mxk.qrcash.model.ui.OperationUiState
+import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import ru.mxk.qrcash.service.QRCashService
 import java.math.BigDecimal
 import kotlin.coroutines.CoroutineContext
 
-class OperationViewModel(private val qrCashService: QRCashService): ViewModel(), CoroutineScope {
-    private val _uiState = MutableStateFlow(OperationUiState(null, null, null))
-    val uiState: StateFlow<OperationUiState> = _uiState.asStateFlow()
+class OperationCreationViewModel(private val qrCashService: QRCashService): ViewModel(), CoroutineScope {
+    private val _uiState = MutableStateFlow(OperationCreationUiState(
+        selectedCard = null,
+        cardList = null,
+        amount = null,
+        operation = null,
+        type = null
+    ))
+    val uiState: StateFlow<OperationCreationUiState> = _uiState.asStateFlow()
 
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
@@ -45,17 +51,58 @@ class OperationViewModel(private val qrCashService: QRCashService): ViewModel(),
         }
     }
 
-    fun createOperation(
-        sessionData: SessionData,
-        card: Card,
-        onCreated: () -> Unit,
-        onError: () -> Unit
-    ) {
-        if (!uiState.value.status.canBeReprocessed) {
+
+    fun reset() {
+        job.cancel()
+        _uiState.update { currentState ->
+            currentState.copy(
+                cardList = null,
+                selectedCard = null,
+                amount = null,
+                type = null,
+                operation = null,
+                status = CreateScreenStatus.INITIALIZING
+            )
+        }
+    }
+
+    fun requestCardList(sessionData: SessionData) {
+        if (!uiState.value.status.canLoadCards) {
             return
         }
 
-        updateStatus(ViewModelStatus.LOADING)
+        updateStatus(CreateScreenStatus.CARD_LIST_LOADING)
+
+        launch {
+            val result = qrCashService.start(sessionData)
+                .map { it.accounts.flatMap { account -> account.cards } }
+
+            if (!result.isPresent()) {
+                updateStatus(CreateScreenStatus.ERROR)
+                return@launch
+            }
+
+            val cards = result.data
+            _uiState.update { currentState ->
+                currentState.copy(
+                    cardList = cards,
+                    selectedCard = cards.first(),
+                    status = CreateScreenStatus.CARD_LIST_LOADED
+                )
+            }
+        }
+    }
+
+    fun createOperation(
+        sessionData: SessionData,
+        card: Card,
+        onCreated: () -> Unit
+    ) {
+        if (!uiState.value.status.canCreateOperation) {
+            return
+        }
+
+        updateStatus(CreateScreenStatus.OPERATION_CREATION)
 
         launch {
             val result = qrCashService.createOperation(
@@ -63,13 +110,14 @@ class OperationViewModel(private val qrCashService: QRCashService): ViewModel(),
                 sessionData
             )
 
-            if (result.isPresent()) {
-                val data = result.data
-                if (data.success) {
-                    handleOnCreated(data, card, onCreated)
-                }
-            } else {
-                handleError(onError)
+            if (result.isEmpty()) {
+                updateStatus(CreateScreenStatus.ERROR)
+                return@launch
+            }
+
+            val data = result.data
+            if (data.success) {
+                handleOnCreated(data, card, onCreated)
             }
         }
     }
@@ -83,21 +131,13 @@ class OperationViewModel(private val qrCashService: QRCashService): ViewModel(),
 
         _uiState.update { currentState ->
             currentState.copy(
-                status = ViewModelStatus.DONE,
+                status = CreateScreenStatus.OPERATION_CREATED,
                 operation = getOperation(orderId, card)
             )
         }
 
         withContext(Dispatchers.Main) {
             onCreated()
-        }
-    }
-
-    private suspend fun handleError(onError: () -> Unit) {
-        updateStatus(ViewModelStatus.ERROR)
-
-        withContext(Dispatchers.Main) {
-            onError()
         }
     }
 
@@ -119,20 +159,10 @@ class OperationViewModel(private val qrCashService: QRCashService): ViewModel(),
         }
     }
 
-    private fun updateStatus(status: ViewModelStatus) {
+    private fun updateStatus(status: CreateScreenStatus) {
         _uiState.update { currentState ->
             currentState.copy(status = status)
         }
     }
 
-    fun reset() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                amount = null,
-                type = null,
-                operation = null,
-                status = ViewModelStatus.INITIALIZING
-            )
-        }
-    }
 }

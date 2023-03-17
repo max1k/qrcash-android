@@ -7,6 +7,7 @@ data class RequestResult<T>(val status: ResultStatus, private val value: T?) {
     val data: T get() = value ?: throw NoSuchElementException("Value is not set")
 
     fun isPresent(): Boolean = value != null
+    fun isEmpty(): Boolean = !isPresent()
 
     fun <K> map(mapper: Function<T, K>): RequestResult<K> {
         return if (status == ResultStatus.DONE) {

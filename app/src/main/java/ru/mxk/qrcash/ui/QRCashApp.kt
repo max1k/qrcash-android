@@ -15,18 +15,15 @@ import ru.mxk.qrcash.ui.error.OperationErrorScreen
 import ru.mxk.qrcash.ui.navigation.QRCashScreen
 import ru.mxk.qrcash.ui.withdraw.ATMCodeScreen
 import ru.mxk.qrcash.ui.withdraw.WithdrawalScreen
-import ru.mxk.qrcash.viewmodel.CardSelectionViewModel
-import ru.mxk.qrcash.viewmodel.OperationViewModel
+import ru.mxk.qrcash.viewmodel.OperationCreationViewModel
 
 @Composable
 fun QRCashApp(
     modifier: Modifier = Modifier,
-    cardSelectionViewModel: CardSelectionViewModel,
-    operationViewModel: OperationViewModel,
+    creationViewModel: OperationCreationViewModel,
     navController: NavHostController = rememberNavController(),
 ) {
-    val cardListUiState by cardSelectionViewModel.uiState.collectAsState()
-    val operationUiState by operationViewModel.uiState.collectAsState()
+    val creationUiState by creationViewModel.uiState.collectAsState()
     val sessionData = SessionData("111", "222", "3333")
 
     NavHost(
@@ -41,47 +38,39 @@ fun QRCashApp(
         }
 
         composable(route = QRCashScreen.WITHDRAWAL.url) {
-            cardSelectionViewModel.requestCardList(
-                sessionData = sessionData,
-                onError = { navController.navigate(QRCashScreen.ERROR.url) }
-            )
-            operationViewModel.setOperationType(OperationType.WITHDRAW)
+            creationViewModel.requestCardList(sessionData = sessionData)
+            creationViewModel.setOperationType(OperationType.WITHDRAW)
 
             WithdrawalScreen(
-                cardListUiState = cardListUiState,
-                operationUiState = operationUiState,
-                onAmountChange = { operationViewModel.setAmount(it) },
+                creationUiState = creationUiState,
+                onAmountChange = { creationViewModel.setAmount(it) },
                 onCreateOperation = {
-                    operationViewModel.createOperation(
+                    creationViewModel.createOperation(
                         sessionData,
-                        cardListUiState.selectedCard!!,
-                        onCreated = { navController.navigate(QRCashScreen.ATM_CODE.url) },
-                        onError = { navController.navigate(QRCashScreen.ERROR.url) }
+                        creationUiState.selectedCard!!,
+                        onCreated = { navController.navigate(QRCashScreen.ATM_CODE.url) }
                     )
                 },
-                onNavigateBack = { resetToStart(cardSelectionViewModel, operationViewModel, navController)}
+                onNavigateBack = { resetToStart(creationViewModel, navController) }
             )
         }
 
         composable(route = QRCashScreen.ERROR.url) {
             OperationErrorScreen(
-                operationUiState.type,
-                onDoneClick = { resetToStart(cardSelectionViewModel, operationViewModel, navController) }
+                creationUiState.type,
+                onDoneClick = { resetToStart(creationViewModel, navController) }
             )
         }
 
         composable(route = QRCashScreen.ATM_CODE.url) {
             ATMCodeScreen(
-                operation = operationUiState.operation!!
+                operation = creationUiState.operation!!
             )
         }
 
         composable(route = QRCashScreen.DEPOSIT.url) {
-            cardSelectionViewModel.requestCardList(
-                sessionData = sessionData,
-                onError = { navController.navigate(QRCashScreen.ERROR.url) }
-            )
-            operationViewModel.setOperationType(OperationType.DEPOSIT)
+            creationViewModel.requestCardList(sessionData = sessionData)
+            creationViewModel.setOperationType(OperationType.DEPOSIT)
 
             DepositScreen()
         }
@@ -89,11 +78,9 @@ fun QRCashApp(
 }
 
 private fun resetToStart(
-    cardSelectionViewModel: CardSelectionViewModel,
-    operationViewModel: OperationViewModel,
+    operationCreationViewModel: OperationCreationViewModel,
     navController: NavHostController
 ) {
-    cardSelectionViewModel.reset()
-    operationViewModel.reset()
     navController.popBackStack(QRCashScreen.OPERATION_CHOOSE.url, inclusive = false)
+    operationCreationViewModel.reset()
 }

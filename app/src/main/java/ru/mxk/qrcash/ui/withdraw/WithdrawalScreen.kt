@@ -18,7 +18,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -45,42 +44,46 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import ru.mxk.qrcash.R
 import ru.mxk.qrcash.model.Card
-import ru.mxk.qrcash.model.ViewModelStatus
-import ru.mxk.qrcash.model.ui.CardListUiState
-import ru.mxk.qrcash.model.ui.OperationUiState
+import ru.mxk.qrcash.model.CreateScreenStatus
+import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import ru.mxk.qrcash.ui.common.LoadingScreen
+import ru.mxk.qrcash.ui.error.OperationErrorScreen
 import ru.mxk.qrcash.ui.preview.PREVIEW_CARD_LIST_UI_STATE
-import ru.mxk.qrcash.ui.preview.PREVIEW_OPERATION_UI_STATE
 import java.math.BigDecimal
 
 
 @Composable
 fun WithdrawalScreen(
-    cardListUiState: CardListUiState,
-    operationUiState: OperationUiState,
+    creationUiState: OperationCreationUiState,
     onAmountChange: (BigDecimal) -> Unit,
     onCreateOperation: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (!cardListUiState.isLoading) {
-        ShowDetails(
-            cardListUiState = cardListUiState,
-            operationUiState = operationUiState,
+    when(creationUiState.status) {
+        CreateScreenStatus.INITIALIZING,
+        CreateScreenStatus.CARD_LIST_LOADING -> LoadingScreen()
+
+        CreateScreenStatus.CARD_LIST_LOADED,
+        CreateScreenStatus.OPERATION_CREATION,
+        CreateScreenStatus.OPERATION_CREATED -> ShowDetails(
+            creationUiState = creationUiState,
             onAmountChange = onAmountChange,
             onCreateOperation = onCreateOperation,
             onNavigateBack = onNavigateBack,
             modifier = modifier,
         )
-    } else {
-        LoadingScreen()
+
+        CreateScreenStatus.ERROR -> OperationErrorScreen(
+            type = creationUiState.type,
+            onDoneClick = onNavigateBack
+        )
     }
 }
 
 @Composable
 private fun ShowDetails(
-    cardListUiState: CardListUiState,
-    operationUiState: OperationUiState,
+    creationUiState: OperationCreationUiState,
     onAmountChange: (BigDecimal) -> Unit,
     onCreateOperation: () -> Unit,
     onNavigateBack: () -> Unit,
@@ -94,29 +97,28 @@ private fun ShowDetails(
 
             HeaderSection(navigateBack = onNavigateBack)
 
-            CardSelectionSection(cardListUiState)
+            CardSelectionSection(creationUiState)
 
-            AmountInputSection(operationUiState, onAmountChange)
+            AmountInputSection(creationUiState, onAmountChange)
 
             CallUsSection()
         }
 
-        ContinueButtonSection(cardListUiState, operationUiState, onCreateOperation)
+        ContinueButtonSection(creationUiState, onCreateOperation)
     }
 }
 
 @Composable
 private fun ContinueButtonSection(
-    cardListUiState: CardListUiState,
-    operationUiState: OperationUiState,
+    creationUiState: OperationCreationUiState,
     onNextClick: () -> Unit
 ) {
     Button(
-        enabled = allParamsAreCorrect(cardListUiState.selectedCard, operationUiState),
+        enabled = allParamsAreCorrect(creationUiState),
         onClick = onNextClick,
         modifier = Modifier.fillMaxWidth()
     ) {
-        if (operationUiState.status == ViewModelStatus.LOADING) {
+        if (creationUiState.status == CreateScreenStatus.OPERATION_CREATION) {
             CircularProgressIndicator(
                 color = Color.White,
                 modifier = Modifier
@@ -131,9 +133,9 @@ private fun ContinueButtonSection(
     }
 }
 
-fun allParamsAreCorrect(card: Card?, operationUiState: OperationUiState): Boolean {
-    val currentAmount = operationUiState.amount ?: return false
-    val cardBalance = card?.balance ?: return false
+fun allParamsAreCorrect(creationUiState: OperationCreationUiState): Boolean {
+    val currentAmount = creationUiState.amount ?: return false
+    val cardBalance = creationUiState.selectedCard?.balance ?: return false
 
     return cardBalance >= currentAmount
 }
@@ -160,7 +162,7 @@ private fun HeaderSection(navigateBack: () -> Unit) {
 }
 
 @Composable
-private fun CardSelectionSection(cardListUiState: CardListUiState) {
+private fun CardSelectionSection(operationCreationUiState: OperationCreationUiState) {
     Text(
         text = stringResource(id = R.string.withdrawal_card),
         fontSize = 16.sp,
@@ -168,8 +170,8 @@ private fun CardSelectionSection(cardListUiState: CardListUiState) {
         modifier = Modifier.padding(bottom = 8.dp)
     )
 
-    if (cardListUiState.selectedCard != null) {
-        SelectedCardSection(cardListUiState.selectedCard)
+    if (operationCreationUiState.selectedCard != null) {
+        SelectedCardSection(operationCreationUiState.selectedCard)
     }
 }
 
@@ -197,7 +199,7 @@ private fun CallUsSection() {
 
 @Composable
 private fun AmountInputSection(
-    operationUiState: OperationUiState,
+    creationUiState: OperationCreationUiState,
     onAmountChange: (BigDecimal) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -218,49 +220,49 @@ private fun AmountInputSection(
                 color = colorResource(id = R.color.secondary_font),
             )
         },
-        value = operationUiState.amount?.toString() ?: "",
+        value = creationUiState.amount?.toString() ?: "",
         onValueChange = { onAmountChange(convertToBigDecimal(it)) },
         modifier = Modifier
             .padding(top = 52.dp)
             .fillMaxWidth()
     )
 
-    AmountButtons(onAmountChange, operationUiState)
+    AmountButtons(onAmountChange, creationUiState)
 }
 
 @Composable
 private fun AmountButtons(
     onAmountChange: (BigDecimal) -> Unit,
-    operationUiState: OperationUiState
+    creationUiState: OperationCreationUiState
 ) {
     Row(
         modifier = Modifier.padding(bottom = 32.dp)
     ) {
         OutlinedBorderText(
             text = "100₽",
-            onClick = { onAmountChange(addAmount(BigDecimal(100), operationUiState)) },
+            onClick = { onAmountChange(addAmount(BigDecimal(100), creationUiState)) },
             modifier = Modifier.padding(top = 8.dp, end = 8.dp)
         )
         OutlinedBorderText(
             text = "500₽",
-            onClick = { onAmountChange(addAmount(BigDecimal(500), operationUiState)) },
+            onClick = { onAmountChange(addAmount(BigDecimal(500), creationUiState)) },
             modifier = Modifier.padding(top = 8.dp, end = 8.dp)
         )
         OutlinedBorderText(
             text = "1 000₽",
-            onClick = { onAmountChange(addAmount(BigDecimal(1000), operationUiState)) },
+            onClick = { onAmountChange(addAmount(BigDecimal(1000), creationUiState)) },
             modifier = Modifier.padding(top = 8.dp, end = 8.dp)
         )
         OutlinedBorderText(
             text = "5 000₽",
-            onClick = { onAmountChange(addAmount(BigDecimal(5000), operationUiState)) },
+            onClick = { onAmountChange(addAmount(BigDecimal(5000), creationUiState)) },
             modifier = Modifier.padding(top = 8.dp, end = 8.dp)
         )
     }
 }
 
-private fun addAmount(amount: BigDecimal, operationUiState: OperationUiState): BigDecimal {
-    val currentAmount = operationUiState.amount ?: BigDecimal.ZERO
+private fun addAmount(amount: BigDecimal, creationUiState: OperationCreationUiState): BigDecimal {
+    val currentAmount = creationUiState.amount ?: BigDecimal.ZERO
     return currentAmount + amount
 }
 
@@ -344,8 +346,7 @@ private fun SelectedCardSection(card: Card) {
 @Composable
 fun WithdrawalScreenPreview() {
     WithdrawalScreen(
-        cardListUiState = PREVIEW_CARD_LIST_UI_STATE,
-        operationUiState = PREVIEW_OPERATION_UI_STATE,
+        creationUiState = PREVIEW_CARD_LIST_UI_STATE,
         onAmountChange = {},
         onCreateOperation = {},
         onNavigateBack = {}

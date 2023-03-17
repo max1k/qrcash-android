@@ -2,10 +2,8 @@ package ru.mxk.qrcash.ui.preview
 
 import ru.mxk.qrcash.model.Card
 import ru.mxk.qrcash.model.CardType
-import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.OperationType
-import ru.mxk.qrcash.model.ui.CardListUiState
-import ru.mxk.qrcash.model.ui.OperationUiState
+import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import java.math.BigDecimal
 
 val PREVIEW_CARD = Card(
@@ -19,13 +17,10 @@ val PREVIEW_CARD = Card(
     cardType = CardType.PREPAID_CARD
 )
 
-val PREVIEW_OPERATION_UI_STATE = OperationUiState(
-    BigDecimal.TEN,
-    Operation(PREVIEW_CARD, OperationType.WITHDRAW, "", BigDecimal.ZERO),
-    OperationType.WITHDRAW
-)
-
-val PREVIEW_CARD_LIST_UI_STATE = CardListUiState(
+val PREVIEW_CARD_LIST_UI_STATE = OperationCreationUiState(
     selectedCard = PREVIEW_CARD,
-    cardList = listOf(PREVIEW_CARD)
+    cardList = listOf(PREVIEW_CARD),
+    amount = BigDecimal(10),
+    operation = null,
+    type = OperationType.WITHDRAW
 )

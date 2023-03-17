@@ -90,7 +90,7 @@ class QRCashService(private val qrCashRepository: QRCashRepository) {
                     .getData()
             )
         } catch (exception: Exception) {
-            Log.e("withdrawal-confirm", exception.message, exception)
+            Log.e("otp-check", exception.message, exception)
             RequestResult.ofFail()
         }
     }
