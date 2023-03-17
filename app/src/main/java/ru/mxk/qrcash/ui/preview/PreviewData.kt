@@ -2,6 +2,7 @@ package ru.mxk.qrcash.ui.preview
 
 import ru.mxk.qrcash.model.Card
 import ru.mxk.qrcash.model.CardType
+import ru.mxk.qrcash.model.CreateScreenStatus
 import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import java.math.BigDecimal
@@ -22,5 +23,6 @@ val PREVIEW_CARD_LIST_UI_STATE = OperationCreationUiState(
     cardList = listOf(PREVIEW_CARD),
     amount = BigDecimal(10),
     operation = null,
-    type = OperationType.WITHDRAW
+    type = OperationType.WITHDRAW,
+    status = CreateScreenStatus.CARD_LIST_LOADED
 )

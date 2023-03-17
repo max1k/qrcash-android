@@ -13,4 +13,6 @@
     <string name="working_on_it">Мы уже работаем, чтобы это исправить.\nПовторите попытку позднее.</string>
     <string name="accepted">Понятно</string>
     <string name="back">Назад</string>
+    <string name="input_atm_code">Введите код с экрана банкомата</string>
+    <string name="code">Код</string>
 </resources>

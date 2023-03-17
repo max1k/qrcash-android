@@ -32,7 +32,7 @@ class OperationCreationViewModel(private val qrCashService: QRCashService): View
     ))
     val uiState: StateFlow<OperationCreationUiState> = _uiState.asStateFlow()
 
-    private val job = Job()
+    private var job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
     fun setAmount(amount: BigDecimal) {
@@ -53,7 +53,6 @@ class OperationCreationViewModel(private val qrCashService: QRCashService): View
 
 
     fun reset() {
-        job.cancel()
         _uiState.update { currentState ->
             currentState.copy(
                 cardList = null,
