@@ -15,4 +15,5 @@
     <string name="back">Назад</string>
     <string name="input_atm_code">Введите код с экрана банкомата</string>
     <string name="code">Код</string>
+    <string name="confirm_withdrawal_operation">Подтвердите снятие наличных</string>
 </resources>

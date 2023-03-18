@@ -1,20 +1,12 @@
 package ru.mxk.qrcash.viewmodel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import ru.mxk.qrcash.model.Card
-import ru.mxk.qrcash.model.CreateScreenStatus
-import ru.mxk.qrcash.model.Operation
-import ru.mxk.qrcash.model.OperationType
-import ru.mxk.qrcash.model.SessionData
+import ru.mxk.qrcash.model.*
 import ru.mxk.qrcash.model.dto.OperationRequest
 import ru.mxk.qrcash.model.dto.OperationResponse
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
@@ -22,7 +14,9 @@ import ru.mxk.qrcash.service.QRCashService
 import java.math.BigDecimal
 import kotlin.coroutines.CoroutineContext
 
-class OperationCreationViewModel(private val qrCashService: QRCashService): ViewModel(), CoroutineScope {
+class OperationCreationViewModel(
+    private val qrCashService: QRCashService
+): ViewModel(), CoroutineScope, Statused {
     private val _uiState = MutableStateFlow(OperationCreationUiState(
         selectedCard = null,
         cardList = null,
@@ -52,7 +46,7 @@ class OperationCreationViewModel(private val qrCashService: QRCashService): View
     }
 
 
-    fun reset() {
+    override fun reset() {
         _uiState.update { currentState ->
             currentState.copy(
                 cardList = null,

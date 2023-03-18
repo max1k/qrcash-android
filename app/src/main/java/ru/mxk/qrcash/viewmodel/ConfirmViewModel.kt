@@ -12,20 +12,16 @@ import kotlinx.coroutines.launch
 import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.ViewModelStatus
-import ru.mxk.qrcash.model.dto.AtmCodeRequest
-import ru.mxk.qrcash.model.ui.AtmCodeUiState
+import ru.mxk.qrcash.model.dto.WithdrawalConfirmationRequest
+import ru.mxk.qrcash.model.ui.ConfirmUiState
 import ru.mxk.qrcash.service.QRCashService
 import kotlin.coroutines.CoroutineContext
 
-class AtmCodeViewModel(
+class ConfirmViewModel(
     private val qrCashService: QRCashService
 ): ViewModel(), CoroutineScope, Statused {
-    companion object {
-        const val OTP_CODE_LENGTH = 4
-    }
-
-    private val _uiState = MutableStateFlow(AtmCodeUiState(code = ""))
-    val uiState: StateFlow<AtmCodeUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ConfirmUiState())
+    val uiState: StateFlow<ConfirmUiState> = _uiState.asStateFlow()
 
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
@@ -34,21 +30,11 @@ class AtmCodeViewModel(
 
     override fun reset() {
         _uiState.update { currentState ->
-            currentState.copy(code = "", status = ViewModelStatus.INIT)
+            currentState.copy(status = ViewModelStatus.INIT)
         }
     }
 
-    fun onCodeChange(code: String) {
-        _uiState.update { currentState ->
-            currentState.copy(code = code)
-        }
-    }
-
-    fun checkCode(sessionData: SessionData, onCodeCheckPass: () -> Unit) {
-        if (uiState.value.code.length != OTP_CODE_LENGTH) {
-            return
-        }
-
+    fun confirm(sessionData: SessionData, onConfirmed: () -> Unit) {
         if (!uiState.value.status.canBeReprocessed) {
             return
         }
@@ -56,8 +42,8 @@ class AtmCodeViewModel(
         changeStatus(ViewModelStatus.LOADING)
 
         launch {
-            val result = qrCashService.atmCodeCheck(
-                AtmCodeRequest(operation.orderId, uiState.value.code),
+            val result = qrCashService.withdrawalConfirm(
+                WithdrawalConfirmationRequest(operation.orderId),
                 sessionData
             )
 
@@ -67,7 +53,7 @@ class AtmCodeViewModel(
             }
 
             changeStatus(ViewModelStatus.DONE)
-            onCodeCheckPass()
+            onConfirmed()
         }
     }
 

@@ -5,17 +5,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import ru.mxk.qrcash.R
 import ru.mxk.qrcash.model.ui.AtmCodeUiState
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AtmCodeInputScreen(
     uiState: AtmCodeUiState,
@@ -63,6 +66,9 @@ fun AtmCodeInputScreen(
                     .padding(bottom = 32.dp)
             )
 
+            val focusRequester = FocusRequester()
+            val keyboardController = LocalSoftwareKeyboardController.current
+
             TextField(
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
@@ -83,10 +89,19 @@ fun AtmCodeInputScreen(
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
                 modifier = Modifier
                     .padding(top = 52.dp, start = 64.dp, end = 64.dp)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            keyboardController?.show()
+                        }
+                    }
             )
 
+            DisposableEffect(Unit) {
+                focusRequester.requestFocus()
+                onDispose { }
+            }
         }
-
     }
 }
 

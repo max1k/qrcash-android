@@ -5,21 +5,11 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -203,7 +193,7 @@ private fun AmountInputSection(
     onAmountChange: (BigDecimal) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    OutlinedTextField(
+    TextField(
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.None,
             autoCorrect = false,
@@ -222,6 +212,7 @@ private fun AmountInputSection(
         },
         value = creationUiState.amount?.toString() ?: "",
         onValueChange = { onAmountChange(convertToBigDecimal(it)) },
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         modifier = Modifier
             .padding(top = 52.dp)
             .fillMaxWidth()
