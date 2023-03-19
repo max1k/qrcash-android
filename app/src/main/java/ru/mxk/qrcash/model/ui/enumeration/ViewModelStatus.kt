@@ -1,4 +1,4 @@
-package ru.mxk.qrcash.model
+package ru.mxk.qrcash.model.ui.enumeration
 
 enum class ViewModelStatus(val canBeReprocessed: Boolean) {
     INIT(true),

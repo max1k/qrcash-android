@@ -28,17 +28,47 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.mxk.qrcash.R
+import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.ui.AtmCodeUiState
+import ru.mxk.qrcash.model.ui.enumeration.CodeCheckStatus
+import ru.mxk.qrcash.ui.error.OperationErrorScreen
 
-@OptIn(ExperimentalComposeUiApi::class)
+
 @Composable
 fun AtmCodeInputScreen(
     uiState: AtmCodeUiState,
     onCodeChange: (String) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when(uiState.status) {
+        CodeCheckStatus.INIT,
+        CodeCheckStatus.LOADING,
+        CodeCheckStatus.INVALID_CODE,
+        CodeCheckStatus.DONE -> CodeInputScreen(
+            uiState = uiState,
+            onCodeChange = onCodeChange,
+            onClose = onClose,
+            modifier = modifier
+        )
+
+        CodeCheckStatus.ERROR -> OperationErrorScreen(
+            type = OperationType.WITHDRAW,
+            onDoneClick = onClose
+        )
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun CodeInputScreen(
+    uiState: AtmCodeUiState,
+    onCodeChange: (String) -> Unit,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(all = 16.dp)
     ) {
 
@@ -66,6 +96,19 @@ fun AtmCodeInputScreen(
                     .padding(bottom = 32.dp)
             )
 
+            val codeIsInvalid = uiState.status == CodeCheckStatus.INVALID_CODE
+            val textFieldColor =
+                if (codeIsInvalid)  {
+                    TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Red
+                    )
+                } else {
+                    TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                    )
+                }
+
             val focusRequester = FocusRequester()
             val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -86,9 +129,9 @@ fun AtmCodeInputScreen(
                 value = uiState.code,
                 onValueChange = { onCodeChange(it) },
                 textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+                colors = textFieldColor,
                 modifier = Modifier
-                    .padding(top = 52.dp, start = 64.dp, end = 64.dp)
+                    .padding(top = 52.dp, bottom = 8.dp, start = 64.dp, end = 64.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged {
                         if (it.isFocused) {
@@ -96,6 +139,12 @@ fun AtmCodeInputScreen(
                         }
                     }
             )
+            if (codeIsInvalid) {
+                Text(
+                    text = stringResource(id = R.string.invalid_code, uiState.attempts ?: 0),
+                    color = Color.Red
+                )
+            }
 
             DisposableEffect(Unit) {
                 focusRequester.requestFocus()
@@ -109,8 +158,8 @@ fun AtmCodeInputScreen(
 @Composable
 fun AtmScreenPreview() {
     AtmCodeInputScreen(
-        uiState = AtmCodeUiState(""),
+        uiState = AtmCodeUiState("", 2, CodeCheckStatus.INVALID_CODE),
         onCodeChange = {},
-        onClose = {}
+        onClose = {},
     )
 }

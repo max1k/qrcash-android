@@ -2,9 +2,9 @@ package ru.mxk.qrcash.ui.preview
 
 import ru.mxk.qrcash.model.Card
 import ru.mxk.qrcash.model.CardType
-import ru.mxk.qrcash.model.CreateScreenStatus
 import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
+import ru.mxk.qrcash.model.ui.enumeration.CreateScreenStatus
 import java.math.BigDecimal
 
 val PREVIEW_CARD = Card(

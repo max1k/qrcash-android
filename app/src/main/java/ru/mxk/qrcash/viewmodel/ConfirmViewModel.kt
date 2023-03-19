@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.SessionData
-import ru.mxk.qrcash.model.ViewModelStatus
 import ru.mxk.qrcash.model.dto.WithdrawalConfirmationRequest
 import ru.mxk.qrcash.model.ui.ConfirmUiState
+import ru.mxk.qrcash.model.ui.enumeration.ViewModelStatus
 import ru.mxk.qrcash.service.QRCashService
 import kotlin.coroutines.CoroutineContext
 

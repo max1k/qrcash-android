@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import ru.mxk.qrcash.R
 import ru.mxk.qrcash.model.Card
-import ru.mxk.qrcash.model.CreateScreenStatus
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
+import ru.mxk.qrcash.model.ui.enumeration.CreateScreenStatus
 import ru.mxk.qrcash.ui.common.LoadingScreen
 import ru.mxk.qrcash.ui.error.OperationErrorScreen
 import ru.mxk.qrcash.ui.preview.PREVIEW_CARD_LIST_UI_STATE

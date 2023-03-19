@@ -36,6 +36,7 @@ fun QRCashApp(
     val atmCodeUiState by atmCodeViewModel.uiState.collectAsState()
     val confirmUiState by confirmViewModel.uiState.collectAsState()
     val sessionData = SessionData("111", "222", "3333")
+    val resetToStart = { resetToStart(viewModels, navController) }
 
     NavHost(
         navController = navController,
@@ -64,14 +65,14 @@ fun QRCashApp(
                         }
                     )
                 },
-                onNavigateBack = { resetToStart(viewModels, navController) }
+                onNavigateBack = resetToStart
             )
         }
 
         composable(route = QRCashScreen.ERROR.url) {
             OperationErrorScreen(
                 creationUiState.type,
-                onDoneClick = { resetToStart(viewModels, navController) }
+                onDoneClick = resetToStart
             )
         }
 
@@ -86,7 +87,7 @@ fun QRCashApp(
                         navController.navigate(QRCashScreen.CONFIRM)
                     }
                 },
-                onClose = { resetToStart(viewModels, navController) }
+                onClose = resetToStart,
             )
         }
 
@@ -100,7 +101,7 @@ fun QRCashApp(
                         navController.navigate(QRCashScreen.ATM_CODE)
                     }
                 },
-                onClose = { resetToStart(viewModels, navController) }
+                onClose = resetToStart
             )
         }
 

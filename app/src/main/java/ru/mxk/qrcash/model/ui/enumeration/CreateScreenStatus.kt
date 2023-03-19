@@ -1,4 +1,4 @@
-package ru.mxk.qrcash.model
+package ru.mxk.qrcash.model.ui.enumeration
 
 enum class CreateScreenStatus(val canLoadCards: Boolean, val canCreateOperation: Boolean) {
     INITIALIZING(canLoadCards = true, canCreateOperation = false),

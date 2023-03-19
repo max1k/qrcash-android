@@ -1,8 +1,9 @@
 package ru.mxk.qrcash.model.ui
 
-import ru.mxk.qrcash.model.ViewModelStatus
+import ru.mxk.qrcash.model.ui.enumeration.CodeCheckStatus
 
 data class AtmCodeUiState(
     val code: String,
-    val status: ViewModelStatus = ViewModelStatus.INIT
+    val attempts: Int?,
+    val status: CodeCheckStatus = CodeCheckStatus.INIT
 )
