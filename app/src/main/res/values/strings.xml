@@ -22,4 +22,6 @@
     <string name="atm_number">Номер банкомата</string>
     <string name="confirm">Подтвердить</string>
     <string name="input_otp_code">Подтвердите операцию кодом из СМС</string>
+    <string name="done">Готово</string>
+    <string name="deposit_card">Карта зачисления</string>
 </resources>

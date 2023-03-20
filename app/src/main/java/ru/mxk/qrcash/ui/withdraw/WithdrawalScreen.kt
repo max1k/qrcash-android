@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.mxk.qrcash.R
+import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import ru.mxk.qrcash.model.ui.enumeration.CreateScreenStatus
 import ru.mxk.qrcash.ui.common.CallUsSection
@@ -155,7 +156,7 @@ private fun HeaderSection(navigateBack: () -> Unit) {
 @Composable
 private fun CardSelectionSection(operationCreationUiState: OperationCreationUiState) {
     if (operationCreationUiState.selectedCard != null) {
-        SelectedCardSection(operationCreationUiState.selectedCard)
+        SelectedCardSection(operationCreationUiState.selectedCard, OperationType.WITHDRAW)
     }
 }
 

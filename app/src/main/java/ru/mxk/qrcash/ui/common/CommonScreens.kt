@@ -24,12 +24,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import ru.mxk.qrcash.R
 import ru.mxk.qrcash.model.Card
+import ru.mxk.qrcash.model.OperationType
 
 @Composable
 fun LoadingScreen() {
@@ -68,11 +70,18 @@ fun CallUsSection(
 @Composable
 fun SelectedCardSection(
     card: Card,
+    operationType: OperationType,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
+        val header = if (operationType == OperationType.WITHDRAW) {
+            stringResource(id = R.string.withdrawal_card)
+        } else {
+            stringResource(id = R.string.deposit_card)
+        }
+
         Text(
-            text = stringResource(id = R.string.withdrawal_card),
+            text = header,
             fontSize = 16.sp,
             color = colorResource(id = R.color.secondary_font),
             modifier = Modifier.padding(bottom = 8.dp)
@@ -116,6 +125,35 @@ fun SelectedCardSection(
         Divider(
             color = colorResource(id = R.color.secondary_font),
             thickness = 1.dp
+        )
+    }
+}
+
+@Composable
+fun DetailsSection(
+    header: String,
+    info: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = header,
+            fontSize = 16.sp,
+            color = colorResource(id = R.color.secondary_font),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Text(
+            text = info,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Divider(
+            color = colorResource(id = R.color.secondary_font),
+            thickness = 1.dp,
+            modifier = Modifier.padding(bottom = 24.dp)
         )
     }
 }
