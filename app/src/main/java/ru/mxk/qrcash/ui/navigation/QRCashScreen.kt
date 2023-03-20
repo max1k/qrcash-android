@@ -6,5 +6,7 @@ enum class QRCashScreen(val url: String) {
     DEPOSIT("deposit"),
     ATM_CODE("atm_code"),
     CONFIRM("confirm"),
-    ERROR("error")
+    OTP_CODE("otp_code"),
+    COMPLETED("completed"),
+    ERROR("error"),
 }

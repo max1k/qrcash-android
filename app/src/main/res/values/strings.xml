@@ -17,4 +17,9 @@
     <string name="code">Код</string>
     <string name="confirm_withdrawal_operation">Подтвердите снятие наличных</string>
     <string name="invalid_code">Неправильный код. Осталось попыток: %d</string>
+    <string name="withdraw_amount">Сумма снятия</string>
+    <string name="commission">Комиссия</string>
+    <string name="atm_number">Номер банкомата</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="input_otp_code">Подтвердите операцию кодом из СМС</string>
 </resources>

@@ -29,14 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.mxk.qrcash.R
 import ru.mxk.qrcash.model.OperationType
-import ru.mxk.qrcash.model.ui.AtmCodeUiState
+import ru.mxk.qrcash.model.ui.CodeUiState
 import ru.mxk.qrcash.model.ui.enumeration.CodeCheckStatus
+import ru.mxk.qrcash.model.ui.enumeration.CodeInputType
 import ru.mxk.qrcash.ui.error.OperationErrorScreen
 
 
 @Composable
-fun AtmCodeInputScreen(
-    uiState: AtmCodeUiState,
+fun CodeInputScreen(
+    type: CodeInputType,
+    uiState: CodeUiState,
     onCodeChange: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -45,7 +47,8 @@ fun AtmCodeInputScreen(
         CodeCheckStatus.INIT,
         CodeCheckStatus.LOADING,
         CodeCheckStatus.INVALID_CODE,
-        CodeCheckStatus.DONE -> CodeInputScreen(
+        CodeCheckStatus.DONE -> CodeInputContentScreen(
+            type = type,
             uiState = uiState,
             onCodeChange = onCodeChange,
             onClose = onClose,
@@ -61,8 +64,9 @@ fun AtmCodeInputScreen(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun CodeInputScreen(
-    uiState: AtmCodeUiState,
+private fun CodeInputContentScreen(
+    type: CodeInputType,
+    uiState: CodeUiState,
     onCodeChange: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -88,8 +92,14 @@ private fun CodeInputScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
+            val headerText = if (type == CodeInputType.ATM_CODE) {
+                stringResource(id = R.string.input_atm_code)
+            } else {
+                stringResource(id = R.string.input_otp_code)
+            }
+
             Text(
-                text = stringResource(id = R.string.input_atm_code),
+                text = headerText,
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -156,9 +166,10 @@ private fun CodeInputScreen(
 
 @Preview
 @Composable
-fun AtmScreenPreview() {
-    AtmCodeInputScreen(
-        uiState = AtmCodeUiState("", 2, CodeCheckStatus.INVALID_CODE),
+fun ScreenPreview() {
+    CodeInputScreen(
+        type = CodeInputType.ATM_CODE,
+        uiState = CodeUiState("", 2, CodeCheckStatus.INVALID_CODE),
         onCodeChange = {},
         onClose = {},
     )

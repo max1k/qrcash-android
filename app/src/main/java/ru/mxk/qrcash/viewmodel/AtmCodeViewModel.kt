@@ -1,17 +1,22 @@
 package ru.mxk.qrcash.viewmodel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.dto.AtmCodeRequest
-import ru.mxk.qrcash.model.ui.AtmCodeUiState
+import ru.mxk.qrcash.model.ui.CodeUiState
 import ru.mxk.qrcash.model.ui.enumeration.CodeCheckStatus
 import ru.mxk.qrcash.service.QRCashService
+import java.math.BigDecimal
 import kotlin.coroutines.CoroutineContext
 
 class AtmCodeViewModel(
@@ -22,14 +27,15 @@ class AtmCodeViewModel(
     }
 
     private val _uiState = MutableStateFlow(
-        AtmCodeUiState(code = "", attempts = null)
+        CodeUiState(code = "", attempts = null)
     )
-    val uiState: StateFlow<AtmCodeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<CodeUiState> = _uiState.asStateFlow()
 
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
     lateinit var operation: Operation
+    lateinit var commission: BigDecimal
 
     override fun reset() {
         _uiState.update { currentState ->
@@ -68,6 +74,8 @@ class AtmCodeViewModel(
             val response = result.data
             if (response.success) {
                 changeStatus(CodeCheckStatus.DONE)
+                commission = response.commission ?: BigDecimal.ZERO
+
                 withContext(Dispatchers.Main) {
                     onCodeCheckPass()
                 }
