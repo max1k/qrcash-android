@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.mxk.qrcash.model.OperationWithCommission
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.dto.WithdrawalConfirmationRequest
@@ -27,6 +28,7 @@ class ConfirmViewModel(
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
     lateinit var operation: OperationWithCommission
+    var otpCodeLength: Int? = null
 
     override fun reset() {
         _uiState.update { currentState ->
@@ -34,7 +36,11 @@ class ConfirmViewModel(
         }
     }
 
-    fun confirm(sessionData: SessionData, onConfirmed: () -> Unit) {
+    fun confirm(
+        sessionData: SessionData,
+        onOtpCheck: () -> Unit,
+        onOperationCompleted: () -> Unit
+    ) {
         if (!uiState.value.status.canBeReprocessed) {
             return
         }
@@ -47,13 +53,22 @@ class ConfirmViewModel(
                 sessionData
             )
 
-            if (result.isEmpty()) {
+            if (result.isEmpty() || !result.data.success) {
                 changeStatus(ViewModelStatus.ERROR)
                 return@launch
             }
 
+            val response = result.data
+            otpCodeLength = response.countNum
             changeStatus(ViewModelStatus.DONE)
-            onConfirmed()
+
+            withContext(Dispatchers.Main) {
+                if (response.needOtp!!) {
+                    onOtpCheck()
+                } else {
+                    onOperationCompleted()
+                }
+            }
         }
     }
 
