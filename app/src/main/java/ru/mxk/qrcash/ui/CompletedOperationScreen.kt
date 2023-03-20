@@ -90,6 +90,7 @@ fun CompletedOperationScreen(
                 .forEach { DetailsSection(it.key, it.value) }
 
             CallUsSection(
+                type = operation.operation.type,
                 modifier = Modifier
                     .weight(1F)
                     .padding(bottom = 48.dp)

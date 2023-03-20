@@ -93,7 +93,7 @@ private fun ShowDetails(
 
             AmountInputSection(creationUiState, onAmountChange)
 
-            CallUsSection()
+            CallUsSection(type = OperationType.WITHDRAW)
         }
 
         ContinueButtonSection(creationUiState, onCreateOperation)
@@ -125,7 +125,7 @@ private fun ContinueButtonSection(
     }
 }
 
-fun allParamsAreCorrect(creationUiState: OperationCreationUiState): Boolean {
+private fun allParamsAreCorrect(creationUiState: OperationCreationUiState): Boolean {
     val currentAmount = creationUiState.amount ?: return false
     val cardBalance = creationUiState.selectedCard?.balance ?: return false
 

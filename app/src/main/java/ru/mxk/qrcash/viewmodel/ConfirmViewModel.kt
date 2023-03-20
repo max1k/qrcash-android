@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.mxk.qrcash.model.OperationWithCommission
+import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.dto.WithdrawalConfirmationRequest
 import ru.mxk.qrcash.model.ui.ConfirmUiState
@@ -27,7 +27,6 @@ class ConfirmViewModel(
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
-    lateinit var operation: OperationWithCommission
     var otpCodeLength: Int? = null
 
     override fun reset() {
@@ -37,6 +36,7 @@ class ConfirmViewModel(
     }
 
     fun confirm(
+        operation: Operation,
         sessionData: SessionData,
         onOtpCheck: () -> Unit,
         onOperationCompleted: () -> Unit
@@ -49,7 +49,7 @@ class ConfirmViewModel(
 
         launch {
             val result = qrCashService.withdrawalConfirm(
-                WithdrawalConfirmationRequest(operation.operation.orderId),
+                WithdrawalConfirmationRequest(operation.orderId),
                 sessionData
             )
 

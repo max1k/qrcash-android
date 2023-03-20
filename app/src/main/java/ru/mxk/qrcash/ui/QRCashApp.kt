@@ -20,8 +20,10 @@ import ru.mxk.qrcash.ui.withdraw.WithdrawalScreen
 import ru.mxk.qrcash.viewmodel.AtmCodeViewModel
 import ru.mxk.qrcash.viewmodel.ConfirmViewModel
 import ru.mxk.qrcash.viewmodel.OperationCreationViewModel
+import ru.mxk.qrcash.viewmodel.OperationViewModel
 import ru.mxk.qrcash.viewmodel.OtpCodeViewModel
 import ru.mxk.qrcash.viewmodel.Statused
+import java.math.BigDecimal
 
 @Composable
 fun QRCashApp(
@@ -29,13 +31,15 @@ fun QRCashApp(
     atmCodeViewModel: AtmCodeViewModel,
     confirmViewModel: ConfirmViewModel,
     otpCodeViewModel: OtpCodeViewModel,
+    operationViewModel: OperationViewModel,
     navController: NavHostController = rememberNavController(),
 ) {
     val viewModels = listOf<Statused>(
         creationViewModel,
         atmCodeViewModel,
         confirmViewModel,
-        otpCodeViewModel
+        otpCodeViewModel,
+        operationViewModel,
     )
     val creationUiState by creationViewModel.uiState.collectAsState()
     val atmCodeUiState by atmCodeViewModel.uiState.collectAsState()
@@ -96,8 +100,7 @@ fun QRCashApp(
                             creationUiState.operation!!,
                             commission = atmCodeViewModel.commission
                         )
-                        confirmViewModel.operation = operation
-                        otpCodeViewModel.operation = operation
+                        operationViewModel.setOperation(operation)
 
                         navController.navigate(QRCashScreen.CONFIRM)
                     }
@@ -108,11 +111,12 @@ fun QRCashApp(
 
         composable(route = QRCashScreen.CONFIRM.url) {
             WithdrawalConfirmScreen(
-                operation = confirmViewModel.operation,
+                operation = operationViewModel.operation,
                 sessionData = sessionData,
                 uiState = confirmUiState,
                 onConfirm = {
                     confirmViewModel.confirm(
+                        operation = operationViewModel.operation.operation,
                         sessionData = sessionData,
                         onOtpCheck = {
                             otpCodeViewModel.otpCodeLength = confirmViewModel.otpCodeLength!!
@@ -131,7 +135,10 @@ fun QRCashApp(
                 uiState = otpCodeUiState,
                 onCodeChange = { code ->
                     otpCodeViewModel.onCodeChange(code)
-                    otpCodeViewModel.checkCode(sessionData) {
+                    otpCodeViewModel.checkCode(
+                        operation = operationViewModel.operation.operation,
+                        sessionData = sessionData
+                    ) {
                         navController.navigate(QRCashScreen.COMPLETED)
                     }
                 },
@@ -143,12 +150,29 @@ fun QRCashApp(
             creationViewModel.requestCardList(sessionData = sessionData)
             creationViewModel.setOperationType(OperationType.DEPOSIT)
 
-            DepositScreen()
+            DepositScreen(
+                creationUiState = creationUiState,
+                onCreateOperation = {
+                    creationViewModel.createOperation(
+                        sessionData,
+                        creationUiState.selectedCard!!,
+                        onCreated = {
+                            operationViewModel.setOperation(
+                                OperationWithCommission(
+                                    creationUiState.operation!!,
+                                    BigDecimal.ZERO
+                                )
+                            )
+                            navController.navigate(QRCashScreen.COMPLETED)
+                        }
+                    ) },
+                onNavigateBack = resetToStart
+            )
         }
 
         composable(route = QRCashScreen.COMPLETED.url) {
             CompletedOperationScreen(
-                operation = confirmViewModel.operation,
+                operation = operationViewModel.operation,
                 onDone = resetToStart
             )
         }

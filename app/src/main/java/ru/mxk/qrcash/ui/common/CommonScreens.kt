@@ -45,12 +45,20 @@ fun LoadingScreen() {
 
 @Composable
 fun CallUsSection(
+    type: OperationType,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val isWithdrawal = type == OperationType.WITHDRAW
+    val text = if (isWithdrawal) {
+        stringResource(id = R.string.withdrawal_troubleshooting)
+    } else {
+        stringResource(id = R.string.deposit_troubleshooting)
+    }
+
     Text(
         text = buildAnnotatedString {
-            append(stringResource(id = R.string.withdrawal_troubleshooting))
+            append(text)
             addStyle(
                 style = SpanStyle(
                     color = Color(0xff64B5F6),

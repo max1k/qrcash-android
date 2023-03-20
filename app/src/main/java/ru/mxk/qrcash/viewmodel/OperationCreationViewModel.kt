@@ -1,11 +1,15 @@
 package ru.mxk.qrcash.viewmodel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.mxk.qrcash.model.Card
 import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.OperationType
@@ -139,7 +143,7 @@ class OperationCreationViewModel(
     }
 
     private fun getOperation(orderId: String, card: Card): Operation =
-        Operation(card, uiState.value.type!!, orderId, uiState.value.amount!!)
+        Operation(card, uiState.value.type!!, orderId, uiState.value.amount ?: BigDecimal(555))
 
     private fun getOperationRequest(card: Card, sessionData: SessionData): OperationRequest {
         val operationType = uiState.value.type ?: throw IllegalStateException("Operation type is not set")

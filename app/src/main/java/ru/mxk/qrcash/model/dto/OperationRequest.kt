@@ -28,7 +28,7 @@ data class OperationRequest(
             publicId: String
         ): OperationRequest
         {
-            return OperationRequest(atmId, OperationType.WITHDRAW, publicId, null, null)
+            return OperationRequest(atmId, OperationType.DEPOSIT, publicId, null, null)
         }
     }
 }

@@ -6,6 +6,7 @@ import ru.mxk.qrcash.App
 import ru.mxk.qrcash.viewmodel.AtmCodeViewModel
 import ru.mxk.qrcash.viewmodel.ConfirmViewModel
 import ru.mxk.qrcash.viewmodel.OperationCreationViewModel
+import ru.mxk.qrcash.viewmodel.OperationViewModel
 import ru.mxk.qrcash.viewmodel.OtpCodeViewModel
 
 
@@ -18,6 +19,7 @@ class ViewModelFactory(private val app: App) : ViewModelProvider.Factory {
             AtmCodeViewModel::class.java -> AtmCodeViewModel(app.qrCashService) as T
             ConfirmViewModel::class.java -> ConfirmViewModel(app.qrCashService) as T
             OtpCodeViewModel::class.java -> OtpCodeViewModel(app.qrCashService) as T
+            OperationViewModel::class.java -> OperationViewModel() as T
             else -> throw IllegalArgumentException("Unexpected class ${modelClass.simpleName}")
         }
     }

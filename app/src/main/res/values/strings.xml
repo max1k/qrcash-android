@@ -8,6 +8,7 @@
     <string name="withdrawal_card">Карта списания</string>
     <string name="amount">Сумма</string>
     <string name="withdrawal_troubleshooting">Если возникли проблемы со снятием наличных, позвоните по бесплатному номеру 8 800 123–45–67</string>
+    <string name="deposit_troubleshooting">Если возникли проблемы с внесением наличных, позвоните по бесплатному номеру 8 800 123–45–67</string>
     <string name="continue_caption">Продолжить</string>
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="working_on_it">Мы уже работаем, чтобы это исправить.\nПовторите попытку позднее.</string>

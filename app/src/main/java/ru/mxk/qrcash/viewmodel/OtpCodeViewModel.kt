@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.mxk.qrcash.model.OperationWithCommission
+import ru.mxk.qrcash.model.Operation
 import ru.mxk.qrcash.model.SessionData
 import ru.mxk.qrcash.model.dto.OtpCodeRequest
 import ru.mxk.qrcash.model.ui.CodeUiState
@@ -28,7 +28,6 @@ class OtpCodeViewModel(
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
     var otpCodeLength: Int = -1
-    lateinit var operation: OperationWithCommission
 
     override fun reset() {
         _uiState.update { currentState ->
@@ -42,7 +41,7 @@ class OtpCodeViewModel(
         }
     }
 
-    fun checkCode(sessionData: SessionData, onCodeCheckPass: () -> Unit) {
+    fun checkCode(operation: Operation, sessionData: SessionData, onCodeCheckPass: () -> Unit) {
         if (uiState.value.code.length != otpCodeLength) {
             return
         }
@@ -55,7 +54,7 @@ class OtpCodeViewModel(
 
         launch {
             val result = qrCashService.otpCodeCheck(
-                OtpCodeRequest(operation.operation.orderId, uiState.value.code),
+                OtpCodeRequest(operation.orderId, uiState.value.code),
                 sessionData
             )
 
