@@ -1,10 +1,5 @@
 package ru.mxk.qrcash.ui.withdraw
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -115,17 +110,12 @@ private fun ShowDetails(
         ContinueButtonSection(creationUiState, onCreateOperation)
 
         if (creationUiState.cardList != null) {
-            AnimatedVisibility(
+            CardSelectionPopup(
                 visible = creationUiState.cardSelectionActivated,
-                enter = fadeIn() + slideInHorizontally(),
-                exit = fadeOut() + slideOutHorizontally()
-            ) {
-                CardSelectionPopup(
-                    creationUiState.cardList,
-                    onCardSelectionDeactivated = onCardSelectionDeactivated,
-                    onCardSelected = onCardSelected
-                )
-            }
+                cards = creationUiState.cardList,
+                onCardSelectionDeactivated = onCardSelectionDeactivated,
+                onCardSelected = onCardSelected
+            )
         }
     }
 }

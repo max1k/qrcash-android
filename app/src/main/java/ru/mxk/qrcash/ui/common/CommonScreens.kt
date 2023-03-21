@@ -2,6 +2,14 @@ package ru.mxk.qrcash.ui.common
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +29,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -159,63 +168,83 @@ private fun CardInfo(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CardSelectionPopup(
+    visible: Boolean,
     cards: List<Card>,
     onCardSelectionDeactivated: () -> Unit,
     onCardSelected: (Card) -> Unit,
 ) {
-    Popup(
-        onDismissRequest = onCardSelectionDeactivated,
-        properties = PopupProperties(
-            focusable = true,
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false,
-            excludeFromSystemGesture = true,
-        )
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInHorizontally(),
+        exit = fadeOut() + slideOutHorizontally()
     ) {
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xDDAAAAAA))
+        Popup(
+            onDismissRequest = onCardSelectionDeactivated,
+            properties = PopupProperties(
+                focusable = true,
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+                excludeFromSystemGesture = true,
+            )
         ) {
-            Column(
+            val backgroundColor by transition.animateColor(label = "ColorAnimation") { enterExistState ->
+                if (enterExistState == EnterExitState.Visible) Color(0xDDAAAAAA) else Color.Transparent
+            }
+
+            val cardBackgroundColor by transition.animateColor(label = "ColorAnimation") { enterExistState ->
+                if (enterExistState == EnterExitState.Visible) Color.White else colorResource(id = R.color.light_gray)
+            }
+
+            Box(
+                contentAlignment = Alignment.BottomCenter,
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(color = Color.White)
-                    .padding(all = 16.dp)
-                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .background(backgroundColor)
+                    .animateEnterExit(
+                        enter = slideInHorizontally(),
+                        exit = slideOutHorizontally()
+                    )
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Top
+                Column(
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .background(color = cardBackgroundColor)
+                        .padding(all = 16.dp)
+                        .fillMaxWidth()
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.withdrawal_card),
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .padding(vertical = 22.dp)
-                            .weight(1F)
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.withdrawal_card),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(vertical = 22.dp)
+                                .weight(1F)
+                        )
 
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.back),
-                        modifier = Modifier
-                            .padding(bottom = 32.dp)
-                            .clickable { onCardSelectionDeactivated() }
-                    )
-                }
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = stringResource(R.string.back),
+                            modifier = Modifier
+                                .padding(bottom = 32.dp)
+                                .clickable { onCardSelectionDeactivated() }
+                        )
+                    }
 
-                for (card in cards) {
-                    CardInfo(
-                        card = card,
-                        modifier = Modifier
-                            .clickable { onCardSelected(card) }
-                            .padding(8.dp)
-                    )
+                    for (card in cards) {
+                        CardInfo(
+                            card = card,
+                            modifier = Modifier
+                                .clickable { onCardSelected(card) }
+                                .padding(8.dp)
+                        )
+                    }
                 }
             }
         }

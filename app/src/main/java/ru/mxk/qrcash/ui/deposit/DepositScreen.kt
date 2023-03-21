@@ -96,7 +96,8 @@ private fun ShowDetails(
 
         if (creationUiState.cardSelectionActivated && creationUiState.cardList != null) {
             CardSelectionPopup(
-                creationUiState.cardList,
+                visible = creationUiState.cardSelectionActivated,
+                cards = creationUiState.cardList,
                 onCardSelectionDeactivated = onCardSelectionDeactivated,
                 onCardSelected = onCardSelected,
             )
