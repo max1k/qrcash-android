@@ -12,5 +12,6 @@ data class OperationCreationUiState(
     val status: CreateScreenStatus = CreateScreenStatus.INITIALIZING,
     val amount: BigDecimal?,
     val operation: Operation?,
-    val type: OperationType?
+    val type: OperationType?,
+    val cardSelectionActivated: Boolean = false
 )

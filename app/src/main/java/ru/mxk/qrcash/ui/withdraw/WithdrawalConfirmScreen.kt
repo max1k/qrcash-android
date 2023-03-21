@@ -102,6 +102,7 @@ private fun ConfirmContent(
             SelectedCardSection(
                 card = operation.operation.card,
                 operationType = operation.operation.type,
+                onCardSelectionActivated = {},
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 

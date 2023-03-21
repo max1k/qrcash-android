@@ -20,10 +20,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.mxk.qrcash.R
+import ru.mxk.qrcash.model.Card
 import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import ru.mxk.qrcash.model.ui.enumeration.CreateScreenStatus
 import ru.mxk.qrcash.ui.common.CallUsSection
+import ru.mxk.qrcash.ui.common.CardSelectionPopup
 import ru.mxk.qrcash.ui.common.LoadingScreen
 import ru.mxk.qrcash.ui.common.SelectedCardSection
 import ru.mxk.qrcash.ui.error.OperationErrorScreen
@@ -35,6 +37,9 @@ fun DepositScreen(
     creationUiState: OperationCreationUiState,
     onCreateOperation: () -> Unit,
     onNavigateBack: () -> Unit,
+    onCardSelectionActivated: () -> Unit,
+    onCardSelectionDeactivated: () -> Unit,
+    onCardSelected: (Card) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when(creationUiState.status) {
@@ -47,6 +52,9 @@ fun DepositScreen(
             creationUiState = creationUiState,
             onCreateOperation = onCreateOperation,
             onNavigateBack = onNavigateBack,
+            onCardSelectionActivated = onCardSelectionActivated,
+            onCardSelectionDeactivated = onCardSelectionDeactivated,
+            onCardSelected = onCardSelected,
             modifier = modifier,
         )
 
@@ -62,6 +70,9 @@ private fun ShowDetails(
     creationUiState: OperationCreationUiState,
     onCreateOperation: () -> Unit,
     onNavigateBack: () -> Unit,
+    onCardSelectionActivated: () -> Unit,
+    onCardSelectionDeactivated: () -> Unit,
+    onCardSelected: (Card) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -74,6 +85,7 @@ private fun ShowDetails(
 
             CardSelectionSection(
                 uiState = creationUiState,
+                onCardSelectionActivated = onCardSelectionActivated,
                 modifier = Modifier.padding(bottom = 48.dp)
             )
 
@@ -81,6 +93,14 @@ private fun ShowDetails(
         }
 
         ContinueButtonSection(creationUiState, onCreateOperation)
+
+        if (creationUiState.cardSelectionActivated && creationUiState.cardList != null) {
+            CardSelectionPopup(
+                creationUiState.cardList,
+                onCardSelectionDeactivated = onCardSelectionDeactivated,
+                onCardSelected = onCardSelected,
+            )
+        }
     }
 }
 
@@ -137,10 +157,16 @@ private fun HeaderSection(navigateBack: () -> Unit) {
 @Composable
 private fun CardSelectionSection(
     uiState: OperationCreationUiState,
-    modifier: Modifier = Modifier
+    onCardSelectionActivated: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (uiState.selectedCard != null) {
-        SelectedCardSection(uiState.selectedCard, OperationType.DEPOSIT, modifier)
+        SelectedCardSection(
+            card = uiState.selectedCard,
+            operationType = OperationType.DEPOSIT,
+            onCardSelectionActivated = onCardSelectionActivated,
+            modifier = modifier
+        )
     }
 }
 
@@ -150,6 +176,9 @@ fun DepositScreenPreview() {
     DepositScreen(
         creationUiState = PREVIEW_CARD_LIST_UI_STATE,
         onCreateOperation = {},
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onCardSelectionDeactivated = {},
+        onCardSelectionActivated = {},
+        onCardSelected = {}
     )
 }

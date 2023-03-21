@@ -76,7 +76,10 @@ fun QRCashApp(
                         }
                     )
                 },
-                onNavigateBack = resetToStart
+                onNavigateBack = resetToStart,
+                onCardSelectionActivated = { creationViewModel.activateCardSelection(true) },
+                onCardSelectionDeactivated = { creationViewModel.activateCardSelection(false) },
+                onCardSelected = creationViewModel::selectCard
             )
         }
 
@@ -170,7 +173,10 @@ fun QRCashApp(
                             navController.navigate(QRCashScreen.COMPLETED)
                         }
                     ) },
-                onNavigateBack = resetToStart
+                onNavigateBack = resetToStart,
+                onCardSelectionActivated = { creationViewModel.activateCardSelection(true) },
+                onCardSelectionDeactivated = { creationViewModel.activateCardSelection(false) },
+                onCardSelected = creationViewModel::selectCard
             )
         }
 

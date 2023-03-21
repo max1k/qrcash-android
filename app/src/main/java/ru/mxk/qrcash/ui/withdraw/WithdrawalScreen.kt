@@ -1,5 +1,10 @@
 package ru.mxk.qrcash.ui.withdraw
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,10 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.mxk.qrcash.R
+import ru.mxk.qrcash.model.Card
 import ru.mxk.qrcash.model.OperationType
 import ru.mxk.qrcash.model.ui.OperationCreationUiState
 import ru.mxk.qrcash.model.ui.enumeration.CreateScreenStatus
 import ru.mxk.qrcash.ui.common.CallUsSection
+import ru.mxk.qrcash.ui.common.CardSelectionPopup
 import ru.mxk.qrcash.ui.common.LoadingScreen
 import ru.mxk.qrcash.ui.common.SelectedCardSection
 import ru.mxk.qrcash.ui.error.OperationErrorScreen
@@ -50,6 +57,9 @@ fun WithdrawalScreen(
     onAmountChange: (BigDecimal) -> Unit,
     onCreateOperation: () -> Unit,
     onNavigateBack: () -> Unit,
+    onCardSelectionActivated: () -> Unit,
+    onCardSelectionDeactivated: () -> Unit,
+    onCardSelected: (Card) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when(creationUiState.status) {
@@ -63,6 +73,9 @@ fun WithdrawalScreen(
             onAmountChange = onAmountChange,
             onCreateOperation = onCreateOperation,
             onNavigateBack = onNavigateBack,
+            onCardSelectionActivated = onCardSelectionActivated,
+            onCardSelectionDeactivated = onCardSelectionDeactivated,
+            onCardSelected = onCardSelected,
             modifier = modifier,
         )
 
@@ -79,6 +92,9 @@ private fun ShowDetails(
     onAmountChange: (BigDecimal) -> Unit,
     onCreateOperation: () -> Unit,
     onNavigateBack: () -> Unit,
+    onCardSelectionActivated: () -> Unit,
+    onCardSelectionDeactivated: () -> Unit,
+    onCardSelected: (Card) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -89,7 +105,7 @@ private fun ShowDetails(
 
             HeaderSection(navigateBack = onNavigateBack)
 
-            CardSelectionSection(creationUiState)
+            CardSelectionSection(creationUiState, onCardSelectionActivated)
 
             AmountInputSection(creationUiState, onAmountChange)
 
@@ -97,6 +113,20 @@ private fun ShowDetails(
         }
 
         ContinueButtonSection(creationUiState, onCreateOperation)
+
+        if (creationUiState.cardList != null) {
+            AnimatedVisibility(
+                visible = creationUiState.cardSelectionActivated,
+                enter = fadeIn() + slideInHorizontally(),
+                exit = fadeOut() + slideOutHorizontally()
+            ) {
+                CardSelectionPopup(
+                    creationUiState.cardList,
+                    onCardSelectionDeactivated = onCardSelectionDeactivated,
+                    onCardSelected = onCardSelected
+                )
+            }
+        }
     }
 }
 
@@ -154,9 +184,16 @@ private fun HeaderSection(navigateBack: () -> Unit) {
 }
 
 @Composable
-private fun CardSelectionSection(operationCreationUiState: OperationCreationUiState) {
+private fun CardSelectionSection(
+    operationCreationUiState: OperationCreationUiState,
+    onCardSelectionActivated: () -> Unit
+) {
     if (operationCreationUiState.selectedCard != null) {
-        SelectedCardSection(operationCreationUiState.selectedCard, OperationType.WITHDRAW)
+        SelectedCardSection(
+            card = operationCreationUiState.selectedCard,
+            operationType = OperationType.WITHDRAW,
+            onCardSelectionActivated = onCardSelectionActivated
+        )
     }
 }
 
@@ -268,6 +305,9 @@ fun WithdrawalScreenPreview() {
         creationUiState = PREVIEW_CARD_LIST_UI_STATE,
         onAmountChange = {},
         onCreateOperation = {},
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onCardSelectionActivated = {},
+        onCardSelectionDeactivated = {},
+        onCardSelected = {}
     )
 }

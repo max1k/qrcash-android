@@ -62,7 +62,8 @@ class OperationCreationViewModel(
                 amount = null,
                 type = null,
                 operation = null,
-                status = CreateScreenStatus.INITIALIZING
+                status = CreateScreenStatus.INITIALIZING,
+                cardSelectionActivated = false
             )
         }
     }
@@ -163,6 +164,21 @@ class OperationCreationViewModel(
     private fun updateStatus(status: CreateScreenStatus) {
         _uiState.update { currentState ->
             currentState.copy(status = status)
+        }
+    }
+
+    fun activateCardSelection(active: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(cardSelectionActivated = active)
+        }
+    }
+
+    fun selectCard(card: Card) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedCard = card,
+                cardSelectionActivated = false
+            )
         }
     }
 
