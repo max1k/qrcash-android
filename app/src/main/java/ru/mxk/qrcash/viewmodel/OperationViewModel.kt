@@ -4,17 +4,16 @@ import androidx.lifecycle.ViewModel
 import ru.mxk.qrcash.model.OperationWithCommission
 
 class OperationViewModel: ViewModel(), Statused {
-    private var _operation: OperationWithCommission? = null
 
-    val operation: OperationWithCommission
-        get() = _operation!!
+    var operation: OperationWithCommission? = null
+        private set
 
 
     fun setOperation(operation: OperationWithCommission) {
-        _operation = operation
+        this.operation = operation
     }
 
     override fun reset() {
-        _operation = null
+        operation = null
     }
 }
