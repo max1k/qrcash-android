@@ -46,7 +46,7 @@ fun QRCashApp(
     val otpCodeUiState by otpCodeViewModel.uiState.collectAsState()
     val confirmUiState by confirmViewModel.uiState.collectAsState()
 
-    val sessionData = SessionData("111", "222", "3333")
+    val sessionData = SessionData("111", "222", "387014")
     val resetToStart = { resetToStart(viewModels, navController) }
 
     NavHost(
