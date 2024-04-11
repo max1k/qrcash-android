@@ -129,11 +129,13 @@ private fun ConfirmContent(
                         color = Color.White,
                         modifier = Modifier
                             .size(16.dp)
+                            .padding(vertical = 8.dp)
                     )
                 } else {
                     Text(
                         text = stringResource(id = R.string.confirm),
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
             }

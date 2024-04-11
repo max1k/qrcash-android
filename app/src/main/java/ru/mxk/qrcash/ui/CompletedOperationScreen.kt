@@ -103,7 +103,8 @@ fun CompletedOperationScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.done),
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
         }

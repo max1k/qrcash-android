@@ -61,7 +61,9 @@ fun OperationErrorScreen(
         ) {
             Text(
                 text = stringResource(id = R.string.accepted),
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
             )
         }
     }
