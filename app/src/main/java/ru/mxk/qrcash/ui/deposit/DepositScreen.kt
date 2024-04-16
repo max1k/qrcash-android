@@ -119,8 +119,7 @@ private fun ContinueButtonSection(
             CircularProgressIndicator(
                 color = Color.White,
                 modifier = Modifier
-                    .size(16.dp)
-                    .padding(vertical = 8.dp)
+                    .size(36.dp)
             )
         } else {
             Text(
